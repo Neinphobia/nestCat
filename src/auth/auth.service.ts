@@ -1,9 +1,9 @@
-import * as bcrypt from 'bcrypt';
 // src/auth/auth.service.ts
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -22,9 +22,14 @@ export class AuthService {
 
     return null;
   }
+  async validateUserById(userId: string): Promise<any> {
+    // Validate user by ID and return the user if found
+    const user = await this.usersService.findById(userId);
+    return user;
+  }
 
-  generateAccessToken(userId: string, password: string): string {
-    // Generate and sign a JWT token with additional information
-    return this.jwtService.sign({ sub: userId, password });
+  generateAccessToken(userId: string): string {
+    // Generate and sign a JWT token
+    return this.jwtService.sign({ sub: userId });
   }
 }

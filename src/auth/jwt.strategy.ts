@@ -17,6 +17,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: any) {
     // Validate the user based on the payload (e.g., retrieve user from database)
     console.log('Received token payload:', payload);
-    return this.authService.validateUserByCredentials(payload.sub, payload.password);
+    return this.authService.validateUserById(payload.sub);
   }
 }

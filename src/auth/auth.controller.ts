@@ -2,22 +2,24 @@
 
 import { Controller, Post, Body, HttpException, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  async login(@Body() credentials: { username: string; password: string }): Promise<{ accessToken: string }> {
-    // Validate user credentials and generate a JWT token
-    const user = await this.authService.validateUserByCredentials(credentials.username, credentials.password);
+  async login(@Body() loginDto: LoginDto): Promise<{ accessToken: string }> {
+    const user = await this.authService.validateUserByCredentials(
+      loginDto.username,
+      loginDto.password,
+    );
 
     if (!user) {
       throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
     }
 
-    // Generate JWT token
-    const accessToken = this.authService.generateAccessToken(user._id,user.password);
+    const accessToken = this.authService.generateAccessToken(user._id);
 
     return { accessToken };
   }
