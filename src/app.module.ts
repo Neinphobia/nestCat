@@ -4,6 +4,14 @@ import { CatsModule } from './cats/cats.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import {UsersModule} from './users/users.module'
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { JwtStrategy } from './auth/jwt.strategy';
+import { AuthService } from './auth/auth.service';
+import { UsersController } from './users/users.controller';
+import { UsersService } from './users/users.service';
+import { AuthController } from './auth/auth.controller';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
 
 let username='furkangonulaldev'
 let password='gnG4fsORJmumhGMn'
@@ -15,11 +23,16 @@ const uri = `mongodb+srv://${username}:${password}@cat.xmsqm.mongodb.net/catsCol
 
 @Module({
   imports: [
-    MongooseModule.forRoot(uri, {}),
+    UsersModule,
     CatsModule,
-    UsersModule
+    MongooseModule.forRoot(uri, {}),
+    JwtModule.register({
+      secret: 'your-secret-key', // Replace with your own secret key
+      signOptions: { expiresIn: '1h' }, // Adjust the expiration time as needed
+    }),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  
+  controllers: [AppController,AuthController,UsersController],
+  providers: [AppService,JwtStrategy,AuthService,UsersService,JwtAuthGuard],
 })
 export class AppModule {}

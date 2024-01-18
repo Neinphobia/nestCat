@@ -16,5 +16,6 @@ import { UserFavoriteCat, UserFavoriteCatSchema } from './user-favorite-cat.sche
   ],
   controllers: [UsersController],
   providers: [UsersService],
+  exports: [UsersService, MongooseModule], // If needed
 })
 export class UsersModule {}

@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Param,Query, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param,Query, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './users.schema';
 import { Cat } from 'src/cats/cats.schema';
+import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -11,7 +13,12 @@ export class UsersController {
   async findAll(): Promise<User[]> {
     return this.usersService.findAll();
   }
-
+ @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  getProfile() {
+    // This route is protected by the JWT strategy; it will return the user's profile
+    return { message: 'You have accessed a protected route!' };
+  }
   @Post()
   async create(@Body() userData: Partial<User>): Promise<User> {
     // Check if the username or email already exists

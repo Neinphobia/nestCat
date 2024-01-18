@@ -17,6 +17,12 @@ export class UsersService {
   async findAll(): Promise<User[]> {
     return this.userModel.find().exec();
   }
+  async findById(userId: string): Promise<User | null> {
+    return this.userModel.findById(userId).exec();
+  }
+  async findByUsername(username: string): Promise<User | null> {
+    return this.userModel.findOne({ username }).exec();
+  }
   async isUsernameExists(username: string): Promise<boolean> {
     const existingUser = await this.userModel.findOne({ username }).exec();
     return !!existingUser;
