@@ -69,7 +69,7 @@ export class UsersService {
     await favoriteCat.save();
   
     user.favoriteCats.push(favoriteCat);
-    user.save();
+    await user.save();
     const resultUser = await this.userModel.findById(user._id).select('-password').exec();
     return resultUser;
   }
