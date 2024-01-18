@@ -3,9 +3,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { CatsModule } from './cats/cats.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import {UsersModule} from './users/users.module'
+import { UsersModule } from './users/users.module';
 import { JwtModule } from '@nestjs/jwt';
-import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './auth/jwt.strategy';
 import { AuthService } from './auth/auth.service';
 import { UsersController } from './users/users.controller';
@@ -31,8 +30,7 @@ const uri = `mongodb+srv://${username}:${password}@cat.xmsqm.mongodb.net/catsCol
       signOptions: { expiresIn: '1h' }, // Adjust the expiration time as needed
     }),
   ],
-  
-  controllers: [AppController,AuthController,UsersController],
-  providers: [AppService,JwtStrategy,AuthService,UsersService,JwtAuthGuard],
+  controllers: [AppController, AuthController, UsersController],
+  providers: [AppService, JwtStrategy, AuthService, UsersService, JwtAuthGuard],
 })
 export class AppModule {}

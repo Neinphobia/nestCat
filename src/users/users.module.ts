@@ -7,7 +7,8 @@ import { UsersService } from './users.service';
 import { User, UserSchema } from './users.schema';
 import { Cat, CatSchema } from '../cats/cats.schema';
 import { UserFavoriteCat, UserFavoriteCatSchema } from './user-favorite-cat.schema';
-
+import { AuthService } from '../auth/auth.service'; // Import AuthService
+import { JwtService } from '@nestjs/jwt'; // Import JwtService
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
@@ -15,7 +16,7 @@ import { UserFavoriteCat, UserFavoriteCatSchema } from './user-favorite-cat.sche
     MongooseModule.forFeature([{ name: UserFavoriteCat.name, schema: UserFavoriteCatSchema }]),
   ],
   controllers: [UsersController],
-  providers: [UsersService],
-  exports: [UsersService, MongooseModule], // If needed
+  providers: [UsersService, AuthService,JwtService], // Add AuthService to providers
+  exports: [UsersService, MongooseModule, AuthService], // If needed
 })
 export class UsersModule {}
