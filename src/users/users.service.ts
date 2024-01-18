@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './users.schema';
@@ -16,6 +16,15 @@ export class UsersService {
 
   async findAll(): Promise<User[]> {
     return this.userModel.find().exec();
+  }
+  async isUsernameExists(username: string): Promise<boolean> {
+    const existingUser = await this.userModel.findOne({ username }).exec();
+    return !!existingUser;
+  }
+  
+  async isEmailExists(email: string): Promise<boolean> {
+    const existingUser = await this.userModel.findOne({ email }).exec();
+    return !!existingUser;
   }
 
   async create(user: Partial<User>): Promise<User> {
@@ -51,9 +60,11 @@ export class UsersService {
       // Optionally handle the case where the cat is already favorited
       // For now, we'll return the user as is
       console.log('You have already favorited this cat :)')
-      return user;
+      const resultUser = await this.userModel.findById(user._id).select('-password').exec();
+      return resultUser;
     }
-  
+
+   
     const favoriteCat = new this.userFavoriteCatModel({ user: userId, favoriteCat: catId });
     await favoriteCat.save();
   
@@ -61,6 +72,40 @@ export class UsersService {
     user.save();
     const resultUser = await this.userModel.findById(user._id).select('-password').exec();
     return resultUser;
+  }
+  ///
+  // async getFavoriteCats(userId: string): Promise<User> {
+  //   const user = await this.userModel.findById(userId).populate('favoriteCats.favoriteCat').exec();
+  //   if (!user) {
+  //     throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+  //   }
+  //   return user;
+  // }
+  async getAllFavoriteCats(): Promise<{ userId: string; userName: string; favoriteCats: Cat[] }[]> {
+    const allFavoriteCats = await this.userFavoriteCatModel
+      .find()
+      .populate('user', 'username') // Only include the username field
+      .populate('favoriteCat')
+      .exec();
+  
+    const result = allFavoriteCats.reduce((accumulator, favoriteCat) => {
+      const { _id: userId, username: userName } = favoriteCat.user;
+      const existingUser = accumulator.find((item) => item.userId === userId);
+  
+      if (existingUser) {
+        existingUser.favoriteCats.push(favoriteCat.favoriteCat);
+      } else {
+        accumulator.push({
+          userId,
+          userName,
+          favoriteCats: [favoriteCat.favoriteCat],
+        });
+      }
+  
+      return accumulator;
+    }, []);
+  
+    return result;
   }
   
 }
